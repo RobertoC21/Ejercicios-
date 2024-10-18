@@ -9,7 +9,7 @@ const AppNavbar = () => {
       <Container>
         <Navbar.Brand href="#">Pokemon CRUD</Navbar.Brand>
         <Nav className="me-auto">
-          <Nav.Link href="#">Home</Nav.Link>
+          <Nav.Link href="#">Casa</Nav.Link>
           <Nav.Link href="#">About</Nav.Link>
         </Nav>
       </Container>
