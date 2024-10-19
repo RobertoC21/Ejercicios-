@@ -1,68 +1,56 @@
-const favoriteModel = require('.../models/favoriteModel');
-const pokemonModel = require('.../models/pokemonModel');
+// controllers/favoriteController.js
+const favoriteModel = require('../models/favoriteModel');
+const pokemonModel = require('../models/pokemonModel');
 
 exports.addFavorite = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { pokemonId } = req.body;
 
-    try {
-
-        const userId = req.userId;
-        const {pokemonId } = req.body;
-        
-
-        //verificar si el pokemon esta en la base de daos 
-        const pokemon = await pokemonModel.findById(pokemonId);
-        if (!pokemon){
-            return res.status(404).json({ message: 'pokemon no disponible '});
-        }
-
-        //verificar si e ppokemon ya esta en favoritos
-
-        const isAlreadyFavorite = await favoriteModel.isAlreadyFavorite(userId, pokemonId);
-        if (isAlreadyFavorite) {
-            return res.status(400).json ({message: 'el pokemon ya esta en tus favoritos' });
-        }
-
-        //agregar a favoritos
-
-        await favoriteModel.add(userId,pokemonId);
-        res.json({ message: 'Pokemon agregado a favoritos'});
-    } catch (error) {
-        res.status(500).json({ message: 'Error al agregar a favorito', error: error.message });
+    // Verificar si el Pokémon existe en la base de datos
+    const pokemon = await pokemonModel.findById(pokemonId);
+    if (!pokemon) {
+      return res.status(404).json({ message: 'Pokémon no disponible' });
     }
-    
+
+    // Verificar si el Pokémon ya está en favoritos
+    const isAlreadyFavorite = await favoriteModel.isFavorite(userId, pokemonId);
+    if (isAlreadyFavorite) {
+      return res.status(400).json({ message: 'El Pokémon ya está en tus favoritos' });
+    }
+
+    // Agregar a favoritos
+    await favoriteModel.add(userId, pokemonId);
+
+    res.json({ message: 'Pokémon agregado a favoritos' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error al agregar favorito', error: error.message });
+  }
 };
 
+exports.getFavorites = async (req, res) => {
+  try {
+    const userId = req.userId;
 
-exports.getFavorites =async (req, res) => {
-    try {
+    // Obtener los Pokémon favoritos del usuario
+    const favorites = await favoriteModel.getFavoritesByUserId(userId);
 
-        const userid =req.userId;
-
-        //obtener ls pokemones favoritos del usuario
-        const favorites = await favoriteModel.getFavoritesByuserId(userid);
-        res.json({ favorites });
-        
-    } catch (error) {
-        res.status(500).json({ message: 'error al obtener favoritos', error: error.message});
-    }
-    
-}
-
-
-
-//eliminando los favoritos del db
+    res.json({ favorites });
+  } catch (error) {
+    res.status(500).json({ message: 'Error al obtener favoritos', error: error.message });
+  }
+};
 
 exports.removeFavorite = async (req, res) => {
-    try {
+  try {
+    const userId = req.userId;
+    const { pokemonId } = req.params;
 
-        const userId = req.userId;
-        const {pokemonId } = req.params;
-        
-        await favoriteModel.remove(userId,pokemonId);
-        res.json({ message: 'Pokemon eliminado de favoritos' });
-    } catch (error) {
-        res.status(500).json({ message:'error al eliminar favoritos', error: error.message });
-        
-    }
+    // Eliminar de favoritos
+    await favoriteModel.remove(userId, pokemonId);
 
+    res.json({ message: 'Pokémon eliminado de favoritos' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error al eliminar favorito', error: error.message });
+  }
 };

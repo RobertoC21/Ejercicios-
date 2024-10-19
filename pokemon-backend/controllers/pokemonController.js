@@ -4,7 +4,7 @@ const pokemonModel = require('../models/pokemonModel');
 
 //OBTENCION DE LOS POKEMONES AGREGADOS POR EL ADMIN
 
-exports.getPokemon = async (req, res) => {
+exports.getPokemons = async (req, res) => {
     try {
         const pokemons = await pokemonModel.getAll();
         res.json({pokemons})
